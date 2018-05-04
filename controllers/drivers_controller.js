@@ -5,6 +5,17 @@ module.exports = {
     res.send({ hi: 'there' });
   },
 
+  index(req, res, next) {
+    const { lng, lat } = req.query;
+
+    Driver.geoNear(
+      { type: 'Point', coordinates: [parseFloat(lng), parseFloat(lat)] },
+      { spherical: true, maxDistance: 200000 }
+    )
+      .then(drivers => res.send(drivers))
+      .catch(next);
+  },
+
   create(req, res, next) {
     const driverProps = req.body;
     Driver.create(driverProps)
@@ -26,7 +37,7 @@ module.exports = {
     const driverId = req.params.id;
 
     Driver.findByIdAndRemove({ _id: driverId })
-    .then(driver => res.status(204).send(driver))
-    .catch(next);
+      .then(driver => res.status(204).send(driver))
+      .catch(next);
   }
 };
